@@ -20,12 +20,15 @@ contract OpenStake is Calculations {
     event EmergencyWithdrawal(address indexed user, uint256 amount, uint256 time);
 
     constructor() {
+        //Placeholder, will be updated
         adjustMinRewardDuration(10);
+        //Placeholder, will be updated to value in ether
         adjustMinStakingAmount(100);
         //0.27 in decimal for %27 APY is 270000000000000000
         //270000000000000000 / 31536000 is the number below 
         //for rewards in second in decimal
         adjustRewardMultiplier(8561643835);
+        //Placeholder, will be updated
         adjustValorDuration(10);
         //0.9 in decimal for 10% penalty
         adjustPenaltyConstant(900000000000000000);
