@@ -1,0 +1,20 @@
+{
+  "name": "openstake-contracts",
+  "version": "1.0.0",
+  "description": "Omlira Staking Contracts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "ethereum-waffle": "^3.2.0",
+    "ethers": "^5.0.0",
+    "hardhat": "^2.9.1"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.3"
+  }
+}
