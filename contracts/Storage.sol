@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./Ownable.sol";
-
-contract Storage is Ownable {
+contract Storage {
 
     uint256 public _rewardsDistributed;
     mapping(address => uint256) public _rewardsClaimed;
