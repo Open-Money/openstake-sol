@@ -75,4 +75,9 @@ contract Storage {
         _withdrawals[user].entranceTimestamp_ = block.timestamp;
         emit WithdrawalEntryAdded(user,amount,block.timestamp);
     }
+
+    function _addRewardsDistributed(address user, uint256 amount) internal {
+        _rewardsDistributed += amount;
+        _rewardsClaimed[user] += amount;
+    }
 }

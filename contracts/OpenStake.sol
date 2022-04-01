@@ -3,8 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "./Calculations.sol";
-import "./Constants.sol";
-
 
 contract OpenStake is Calculations {
 
@@ -53,8 +51,10 @@ contract OpenStake is Calculations {
         require(!_isEmergency,"OpenStake: There is an emergency");
         require(_hasStake(msg.sender),"OpenStake: You dont have a stake");
         require(_canRemoveStake(msg.sender),"OpenStake: You cant remove stake now");
-        _addWithdrawalEntry(msg.sender, calculateReward(msg.sender));
-        emit Unstake(msg.sender,calculateReward(msg.sender),block.timestamp);
+        uint calculatedReward = calculateReward(msg.sender);
+        _addRewardsDistributed(msg.sender, calculatedReward - _stakedAmount(msg.sender));
+        _addWithdrawalEntry(msg.sender, calculatedReward);
+        emit Unstake(msg.sender,calculatedReward,block.timestamp);
         _deleteStakeEntry(msg.sender);
     }
 
@@ -62,8 +62,9 @@ contract OpenStake is Calculations {
         require(!_isEmergency,"OpenStake: There is an emergency");
         require(_hasStake(msg.sender),"OpenStake: You dont have a stake");
         require(!_canRemoveStake(msg.sender),"OpenStake: You can remove stake normally");
-        _addWithdrawalEntry(msg.sender, _calculatePenalty(_stakedAmount(msg.sender)));
-        emit UnstakeWithPenalty(msg.sender, _calculatePenalty(_stakedAmount(msg.sender)), block.timestamp);
+        uint penalty = _calculatePenalty(_stakedAmount(msg.sender));
+        _addWithdrawalEntry(msg.sender, penalty);
+        emit UnstakeWithPenalty(msg.sender, penalty, block.timestamp);
         _deleteStakeEntry(msg.sender);
     }
 
@@ -81,8 +82,9 @@ contract OpenStake is Calculations {
         require(!_isEmergency,"OpenStake: There is an emergency");
         require(_hasStake(msg.sender),"OpenStake: You dont have a stake");
         require(_canRemoveStake(msg.sender),"OpenStake: You cant compound stake now");
-        emit Compound(msg.sender, calculateReward(msg.sender), block.timestamp);
-        _addStakeEntry(msg.sender,calculateReward(msg.sender));
+        uint reward = calculateReward(msg.sender);
+        emit Compound(msg.sender, reward, block.timestamp);
+        _addStakeEntry(msg.sender, reward);
     }
 
     function setEmergency(bool status) public onlyOwner {
@@ -94,8 +96,9 @@ contract OpenStake is Calculations {
         require(_isEmergency,"OpenStake: there is no emergency");
         require(_hasStake(msg.sender),"OpenStake: You dont have a stake");
         address payable receiver = payable(msg.sender);
-        receiver.transfer(_stakedAmount(msg.sender));
-        emit EmergencyUnstake(msg.sender, _stakedAmount(msg.sender), block.timestamp);
+        uint stakedAmount = _stakedAmount(msg.sender);
+        receiver.transfer(stakedAmount);
+        emit EmergencyUnstake(msg.sender, stakedAmount, block.timestamp);
         _deleteStakeEntry(msg.sender);
     }
 
@@ -103,8 +106,9 @@ contract OpenStake is Calculations {
         require(_isEmergency,"OpenStake: there is no emergency");
         require(_hasWithdrawal(msg.sender),"OpenStake: You dont have a stake");
         address payable receiver = payable(msg.sender);
-        receiver.transfer(_withdrawalAmount(msg.sender));
-        emit EmergencyWithdrawal(msg.sender, _withdrawalAmount(msg.sender), block.timestamp);
+        uint withdrawalAmount = _withdrawalAmount(msg.sender);
+        receiver.transfer(withdrawalAmount);
+        emit EmergencyWithdrawal(msg.sender, withdrawalAmount, block.timestamp);
         _deleteWithdrawalEntry(msg.sender);
     }
 }
