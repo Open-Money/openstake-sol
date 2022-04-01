@@ -7,18 +7,13 @@ contract Storage {
     uint256 public _rewardsDistributed;
     mapping(address => uint256) public _rewardsClaimed;
 
-    struct Stakes {
+    struct StakeWithdraw {
         uint256 entranceTimestamp_;
         uint256 entranceAmount_;
     }
 
-    struct Withdrawals {
-        uint256 entranceTimestamp_;
-        uint256 entranceAmount_;
-    }
-
-    mapping(address => Stakes) public _stakes;
-    mapping(address => Withdrawals) public _withdrawals;
+    mapping(address => StakeWithdraw) public _stakes;
+    mapping(address => StakeWithdraw) public _withdrawals;
 
     event StakeEntryAdded(address indexed user, uint256 amount, uint256 time);
     event StakeEntryRemoved(address indexed user, uint256 amount, uint256 time);
