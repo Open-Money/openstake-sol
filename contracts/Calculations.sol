@@ -8,20 +8,20 @@ import "./Storage.sol";
 
 contract Calculations is Constants, Storage {
 
-    function calculatePendingReward(address user) public view returns (uint256) {
-        return _canRemoveStake(user) ? _calculateReward(_elapsedTime(user),_stakedAmount(user)) : 0;
+    function calculatePendingReward(address user, uint index) public view returns (uint256) {
+        return _canRemoveStake(user, index) ? _calculateReward(_elapsedTime(user, index),_stakedAmount(user, index)) : 0;
     }
 
-    function calculateReward(address user) public view returns (uint256) {
-        return _calculateReward(_elapsedTime(user),_stakedAmount(user));
+    function calculateReward(address user, uint index) public view returns (uint256) {
+        return _calculateReward(_elapsedTime(user, index),_stakedAmount(user, index));
     }
 
-    function _elapsedTime(address user) internal view returns (uint256) {
-        return block.timestamp - _stakeTime(user);
+    function _elapsedTime(address user, uint index) internal view returns (uint256) {
+        return block.timestamp - _stakeTime(user, index);
     }
 
-    function _canRemoveStake(address user) internal view returns (bool) {
-        return _elapsedTime(user) > _minRewardDuration ? true : false;
+    function _canRemoveStake(address user, uint index) internal view returns (bool) {
+        return _elapsedTime(user, index) > _minRewardDuration ? true : false;
     }
 
     function _calculateReward(uint256 elapsedTime, uint256 amount) internal view returns (uint) {
@@ -33,12 +33,12 @@ contract Calculations is Constants, Storage {
         return amount * _penaltyConstant / 10**18;
     }
 
-    function _elapsedWithdrawalTime(address user) internal view returns (uint256) {
-        return block.timestamp - _withdrawals[user].entranceTimestamp_;
+    function _elapsedWithdrawalTime(address user, uint index) internal view returns (uint256) {
+        return block.timestamp - _withdrawals[user][index].entranceTimestamp_;
     }
 
-    function _canWithdraw(address user) internal view returns (bool) {
-        return _elapsedWithdrawalTime(user) >= _valorDuration ? true : false;
+    function _canWithdraw(address user, uint index) internal view returns (bool) {
+        return _elapsedWithdrawalTime(user, index) >= _valorDuration ? true : false;
     }
    
 }
