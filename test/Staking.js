@@ -76,14 +76,24 @@ describe("Staking contract", function () {
         expect(_rewardsClaimedAddr1).to.equal(0);
     });
 
-    it("Should be staking & unstaking & withdrawing", async function() {
+    it("Should be staking & unstaking & compounding & withdrawing", async function() {
         await StakingContract.connect(addresses[3]).stake({value: ethers.utils.parseEther("30")});
         let myStakes = await StakingContract.stakes(addresses[3].address);
         //console.log(myStakes);
         await StakingContract.connect(addresses[3]).stake({value: ethers.utils.parseEther("30")});
         myStakes = await StakingContract.stakes(addresses[3].address);
         //console.log(myStakes);
-        await network.provider.send("evm_increaseTime",[3600]);
+        await network.provider.send("evm_increaseTime",[3600000]);
+        await StakingContract.connect(addresses[3]).compound(1);
+        await network.provider.send("evm_increaseTime",[3600000]);
+        await StakingContract.connect(addresses[3]).compound(1);
+        await network.provider.send("evm_increaseTime",[3600000]);
+        await StakingContract.connect(addresses[3]).compound(1);
+        await network.provider.send("evm_increaseTime",[3600000]);
+        await StakingContract.connect(addresses[3]).compound(1);
+        await network.provider.send("evm_increaseTime",[3600000]);
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        console.log(myStakes);
         //console.log("OK");
         await StakingContract.connect(addresses[3]).unstake(0);
         //console.log("OK");
@@ -101,7 +111,7 @@ describe("Staking contract", function () {
         //console.log(myStakes);
 
         let myWithdrawals = await StakingContract.withdrawals(addresses[3].address);
-        //console.log(myWithdrawals);
+        console.log(myWithdrawals);
 
         await network.provider.send("evm_increaseTime",[3600]);
         await StakingContract.connect(addresses[3]).withdraw(0);
