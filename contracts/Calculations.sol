@@ -34,7 +34,7 @@ contract Calculations is Constants, Storage {
     }
 
     function _elapsedWithdrawalTime(address user, uint index) internal view returns (uint256) {
-        return block.timestamp - _withdrawals[user][index].entranceTimestamp_;
+        return block.timestamp - _withdrawalTime(user, index);
     }
 
     function _canWithdraw(address user, uint index) internal view returns (bool) {
