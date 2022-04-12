@@ -32,7 +32,7 @@ contract OpenStake is Calculations {
         adjustPenaltyConstant(900000000000000000);
     }
 
-    function depositToTreasuy() public payable onlyOwner {}
+    function depositToTreasury() public payable onlyOwner {}
 
     function withdrawFromTreasury(uint256 amount) public onlyOwner {
         address payable receiver = payable(msg.sender);

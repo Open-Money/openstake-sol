@@ -65,17 +65,14 @@ contract Storage {
 
     function _deleteStakeEntry(address user, uint index) internal {
         emit StakeEntryRemoved(user,_stakes[user][index],block.timestamp);
-        if(_stakes[user].length == index + 1) {
-            delete _stakes[user][index];
-            delete _stakeTimes[user][index];
-        } else {
+        if(_stakes[user].length != index + 1) {
             for (uint i = index; i < _stakes[user].length - 1; i++) {
                 _stakes[user][i] = _stakes[user][i+1];
                 _stakeTimes[user][i] = _stakeTimes[user][i+1];
             }
-            delete _stakes[user][_stakes[user].length];
-            delete _stakeTimes[user][_stakeTimes[user].length];
-        }
+        } 
+        _stakes[user].pop();
+        _stakeTimes[user].pop();
     }
 
     function _addStakeEntry(address user, uint256 amount) internal {
@@ -86,17 +83,14 @@ contract Storage {
 
     function _deleteWithdrawalEntry(address user, uint index) internal {
         emit WithdrawalEntryRemoved(user,_withdrawals[user][index],block.timestamp);
-        if(_withdrawals[user].length == index + 1) {
-            delete _withdrawals[user][index];
-            delete _withdrawalTimes[user][index];
-        } else {
+        if(_withdrawals[user].length != index + 1) {
             for (uint i = index; i < _withdrawals[user].length - 1; i++) {
                 _withdrawals[user][i] = _withdrawals[user][i+1];
                 _withdrawalTimes[user][i] = _withdrawalTimes[user][i+1];
             }
-            delete _withdrawals[user][_withdrawals[user].length];
-            delete _withdrawalTimes[user][_withdrawalTimes[user].length];
-        }
+        } 
+        _withdrawals[user].pop();
+        _withdrawalTimes[user].pop();
     }
 
     function _addWithdrawalEntry(address user, uint256 amount) internal {

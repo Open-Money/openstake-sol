@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 describe("Staking contract", function () {
 
@@ -7,13 +7,15 @@ describe("Staking contract", function () {
     let StakingContract;
     let addresses;
 
-    it("Deployment should be fine", async function () {
+    it("Should be deploying contract", async function () {
         addresses = await ethers.getSigners();
         Staking = await ethers.getContractFactory("OpenStake");
         StakingContract = await Staking.deploy();
+
+        await StakingContract.depositToTreasury({value: ethers.utils.parseEther("70")});
     });
 
-    it("Trying to adjust owner", async function() {
+    it("Should be adjusting owner", async function() {
         await expect(
             StakingContract.connect(addresses[1]).changeOwner(addresses[2].address)
         ).to.be.revertedWith("Ownable: you are not the owner");
@@ -27,7 +29,7 @@ describe("Staking contract", function () {
         await StakingContract.connect(addresses[1]).changeOwner(addresses[0].address)
     })
 
-    it("Testing constants", async function() {
+    it("Should be setting constants", async function() {
         await expect(
             StakingContract.connect(addresses[1]).adjustMinRewardDuration(30)
         ).to.be.revertedWith("Ownable: you are not the owner");
@@ -67,5 +69,46 @@ describe("Staking contract", function () {
         expect(_penaltyConstant).to.equal("800000000000000000");
     });
 
-    
+    it("Should be checking storage functions", async function() {
+        let _rewardsDistributed = await StakingContract._rewardsDistributed();
+        expect(_rewardsDistributed).to.equal(0);
+        let _rewardsClaimedAddr1 = await StakingContract._rewardsClaimed(addresses[1].address);
+        expect(_rewardsClaimedAddr1).to.equal(0);
+    });
+
+    it("Should be staking & unstaking & withdrawing", async function() {
+        await StakingContract.connect(addresses[3]).stake({value: ethers.utils.parseEther("30")});
+        let myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+        await StakingContract.connect(addresses[3]).stake({value: ethers.utils.parseEther("30")});
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+        await network.provider.send("evm_increaseTime",[3600]);
+        //console.log("OK");
+        await StakingContract.connect(addresses[3]).unstake(0);
+        //console.log("OK");
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+        await StakingContract.connect(addresses[3]).unstake(0);
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+        await StakingContract.connect(addresses[3]).stake({value: ethers.utils.parseEther("30")});
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+        await network.provider.send("evm_increaseTime",[3600]);
+        await StakingContract.connect(addresses[3]).unstake(0);
+        myStakes = await StakingContract.stakes(addresses[3].address);
+        //console.log(myStakes);
+
+        let myWithdrawals = await StakingContract.withdrawals(addresses[3].address);
+        //console.log(myWithdrawals);
+
+        await network.provider.send("evm_increaseTime",[3600]);
+        await StakingContract.connect(addresses[3]).withdraw(0);
+        await StakingContract.connect(addresses[3]).withdraw(0);
+        await StakingContract.connect(addresses[3]).withdraw(0);
+
+        myWithdrawals = await StakingContract.withdrawals(addresses[3].address);
+        //console.log(myWithdrawals);
+    });
 })
